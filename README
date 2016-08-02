@@ -1,0 +1,6 @@
+This is a small project that makes it easier to open files or folders in 
+Sublime Text editor. Once set up, the user can open up a terminal and type in:
+"mysubl <file or folder name>" and the script will recursively go through the
+users home folder seraching for the given folders. Adding a --root will start
+the script from the root directory (this is not the default for performance
+purposes). The user can include multiple files and folders at once.
