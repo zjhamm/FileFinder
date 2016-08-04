@@ -40,7 +40,6 @@ int main(int argc, char *argv[])
 	findObject(startdir, 0, input);
 
 	//Request user to choose path if multiple
-	cout << input.size() << endl;
 	for (int x = 0; x < input.size(); x++) {
 		if (input.at(x).getPaths().size() > 1) {
 			pathnames.push_back(promptUserChoice(input.at(x).getPaths(), input.at(x).getName()));
@@ -71,20 +70,38 @@ int main(int argc, char *argv[])
 
 /**************************************************
 
-					FUNCTIONS
+				HELPER FUNCTIONS
 
 **************************************************/
 
+/*
+	Loops through the users input and creates objects
+	for the requested file or folder names
+*/
 void copyInput(vector<Object> &input, char *argv[], int i) {
-
-	//Loop through the input creating objects
-	//Saving them to our vector	
 
 	while(argv[i] != "" && argv[i] != 0) {
 		Object temp = Object(string(argv[i]));
 		input.push_back(temp);
 		i++;
 	}
+}
+
+string promptUserChoice(vector<string> paths, string name) {
+
+	int input;
+
+	cout << "Found multiple files or directories with the name: " << name << endl;
+	cout << "Please choose from the following list which you would like to open: " << endl;
+
+	for (int i = 0; i < paths.size(); i++) {
+		cout << i + 1 << ": " << paths.at(i) << endl;
+	}
+
+	cout << endl << "Input: ";
+	cin >> input;
+
+	return paths.at(input - 1);
 }
 
 int getStartingDir(const char **homedir, char ** argv) {
@@ -121,23 +138,6 @@ int vectorContains(vector<Object> input, string name) {
 	}
 
 	return -1;
-}
-
-string promptUserChoice(vector<string> paths, string name) {
-
-	int input;
-
-	cout << "Found multiple files or directories with the name: " << name << endl;
-	cout << "Please choose from the following list which you would like to open: " << endl;
-
-	for (int i = 0; i < paths.size(); i++) {
-		cout << i + 1 << ": " << paths.at(i) << endl;
-	}
-
-	cout << endl << "Input: ";
-	cin >> input;
-
-	return paths.at(input - 1);
 }
 
 void findObject(const char *name, int level, vector<Object> &input) {
