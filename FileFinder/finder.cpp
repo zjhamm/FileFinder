@@ -1,20 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-#include <unistd.h>
-#include <sys/types.h>
-#include <dirent.h>
-#include <stdio.h>
-#include <string.h>
-#include <pwd.h>
-#include "object.cpp"
-
-using namespace std;
-
-void copyInput(vector<Object> &input, char *argv[], int i);
-int getStartingDir(const char **homedir, char **argv);
-void findObject(const char *name, int level, vector<Object> &object);
-string promptUserChoice(vector<string> paths, string name);
+#include "finder.h"
 
 int main(int argc, char *argv[])
 {
@@ -44,8 +28,13 @@ int main(int argc, char *argv[])
 		if (input.at(x).getPaths().size() > 1) {
 			pathnames.push_back(promptUserChoice(input.at(x).getPaths(), input.at(x).getName()));
 		}
-		else {
+		else if (input.at(x).getPaths().size() == 1) {
 			pathnames.push_back(input.at(x).getPaths().at(0));
+		}
+		else {
+			cout << "Could not find a file or directory with the given name." << endl;
+			cout << "Please try again" << endl;
+			return 0;
 		}
 	}
 
@@ -68,78 +57,6 @@ int main(int argc, char *argv[])
 	system(sublime_command.c_str());
 }
 
-/**************************************************
-
-				HELPER FUNCTIONS
-
-**************************************************/
-
-/*
-	Loops through the users input and creates objects
-	for the requested file or folder names
-*/
-void copyInput(vector<Object> &input, char *argv[], int i) {
-
-	while(argv[i] != "" && argv[i] != 0) {
-		Object temp = Object(string(argv[i]));
-		input.push_back(temp);
-		i++;
-	}
-}
-
-string promptUserChoice(vector<string> paths, string name) {
-
-	int input;
-
-	cout << "Found multiple files or directories with the name: " << name << endl;
-	cout << "Please choose from the following list which you would like to open: " << endl;
-
-	for (int i = 0; i < paths.size(); i++) {
-		cout << i + 1 << ": " << paths.at(i) << endl;
-	}
-
-	cout << endl << "Input: ";
-	cin >> input;
-
-	return paths.at(input - 1);
-}
-
-int getStartingDir(const char **homedir, char ** argv) {
-
-	int j = 1;
-
-	while(argv[j] != "" && argv[j] != 0) {
-		if (strcmp(argv[j], "--root") == 0) {
-			cout << "Starting from root" << endl;
-			*homedir = "/";
-			j++;
-			return j;
-		}
-		else if (argv[j][0] != '-') {
-			break;
-		}
-
-		j++;
-	}
-
-	//Get the home directory of the current user
-	if((*homedir = getenv("HOME")) == NULL) {
-		*homedir = getpwuid(getuid())->pw_dir;
-	}
-
-	return j;
-}
-
-int vectorContains(vector<Object> input, string name) {
-	for (int i = 0; i < input.size(); i++) {
-		if (input.at(i).getName() == name) {
-			return i;
-		}
-	}
-
-	return -1;
-}
-
 void findObject(const char *name, int level, vector<Object> &input) {
 
 	DIR *dir;
@@ -155,6 +72,7 @@ void findObject(const char *name, int level, vector<Object> &input) {
 		return;
 
 	do {
+		
 		//If the entry type is Directory
 		if(entry->d_type == DT_DIR) {
 			
@@ -162,6 +80,9 @@ void findObject(const char *name, int level, vector<Object> &input) {
 			int i;
 			int len = snprintf(path, sizeof(path) - 1, "%s/%s", name, entry->d_name);
 			path[len] = 0;
+
+			if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+				continue;
 
 			i = vectorContains(input, string(entry->d_name));
 
@@ -175,9 +96,6 @@ void findObject(const char *name, int level, vector<Object> &input) {
 
 					input.at(i).addPath(string(path));
 			}
-
-			if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
-				continue;
 
 			//printf("%*s[%s]\n", level*2, "", entry->d_name);
 
