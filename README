@@ -1,3 +1,4 @@
+-------------------------------- MAIN PROJECT --------------------------------
 This is a small project that makes it easier to open files or folders in 
 Sublime Text editor. Once set up, the user can open up a terminal and type in:
 "mysubl <file or folder name>" and the script will recursively go through the
@@ -5,4 +6,19 @@ users home folder seraching for the given folders. Adding a --root will start
 the script from the root directory (this is not the default for performance
 purposes). The user can include multiple files and folders at once. 
 
+
+-------------------------------- NEW FEATURES -------------------------------
+A user can now type in part of the file or folder names, and the algorithm
+will look for substrings during it's search. For example, if the user types
+in 'finder' the algorithm will return 'FileFinder' as an option to open.
+
+-------------------------------- COMMENTS -----------------------------------
 The shell script simply compiles the c++ code and runs it.
+
+I was originally thinking that I needed to remove file extensions in order to 
+let the user open a file if they had omitted the file type. I had set up a
+html scraper in python to go online and grab a list of file extensions,
+but once I finished that I realized how inefficient and a waste of time it
+was because I could simply just find a substring of the file. I left the 
+python script there incase I may need it for a different project in the future
+or if any third-parties are interested in seeing it.
