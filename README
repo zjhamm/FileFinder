@@ -19,35 +19,35 @@ There is a small setup required:
 -------------------------------------------- NEW FEATURES --------------------------------------
 8/4/2016 - File Substring Search
 
-		   A user can now type in part of the file or folder names, and the algorithm will look 
-		   for substrings during it's search. For example, if the user types in 'finder' the 
-		   algorithm will return 'FileFinder' as an option to open.
+	A user can now type in part of the file or folder names, and the algorithm will look 
+	for substrings during it's search. For example, if the user types in 'finder' the 
+	algorithm will return 'FileFinder' as an option to open.
 
 8/4/2016 - Type Specified Search
 
-		   A user can now specify if they want to only search for directories or files by adding 
-		   the argument -d or -f to their command. For example:
+	A user can now specify if they want to only search for directories or files by adding 
+	the argument -d or -f to their command. For example:
 
-		   	Command: 'mysubl -d finder' - will only search for DIRECTORIES with finder in the name
+	Command: 'mysubl -d finder' - will only search for DIRECTORIES with finder in the name
 
-		   	Command: 'mysubl -f finder' - will only search for FILES with finder in the name
+	Command: 'mysubl -f finder' - will only search for FILES with finder in the name
 
 8/2/2016 - Start Search From Root
 
-		   A user can now start their search program from the root directory (/). This is not 
-		   the default case for performance reasons. Files most used are generally under the 
-		   users HOME folder so that is why we start there. If a user wishes to start from root 
-		   add the argument --root. For example:
+	A user can now start their search program from the root directory (/). This is not 
+	the default case for performance reasons. Files most used are generally under the 
+	users HOME folder so that is why we start there. If a user wishes to start from root 
+	add the argument --root. For example:
 
-		    Command: 'mysubl --root finder'
+	Command: 'mysubl --root finder'
 
 
 ---------------------------------------------- COMMENTS -----------------------------------------
  - Possible plans: Introduce a feature to recommend files/folders that are more commonly used 
- 				   instead of just returning every file/folder. This could greatly improve the 
- 				   performace by not even needing to perform the search if common pathnames were 
- 				   saved in a local file. The algorithm could just read from the file and ask the 
- 				   user if they would like to open saved pathnames. Otherwise, run the search.
+ 		instead of just returning every file/folder. This could greatly improve the 
+ 		performace by not even needing to perform the search if common pathnames were 
+ 		saved in a local file. The algorithm could just read from the file and ask the 
+ 		user if they would like to open saved pathnames. Otherwise, run the search.
 
  - The shell script simply compiles the c++ code and runs it.
 
