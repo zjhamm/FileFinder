@@ -36,15 +36,15 @@ string promptUserChoice(vector<string> paths, string name) {
 }
 
 /*
-	If the user specifies the additional command --root the program
-	will start from the root directory. Otherwise the program starts
-	at the HOME directory by default.
+	If the user specifies an additional command such as --root the function will
+	act acoordingly. For example, --root will start the program from the root 
+	directory, otherwise the program starts at the HOME directory by default.
 
 	e.x.:		mysubl --root finder.cpp   	(starts from root)
 
 				mysubl finder.cpp    		(starts from HOME)
 */
-int getStartingDir(const char **homedir, char ** argv) {
+int argumentProcessor(const char **homedir, char **argv, string *funnel_type) {
 
 	int j = 1;
 
@@ -54,16 +54,22 @@ int getStartingDir(const char **homedir, char ** argv) {
 		// Case 1: Check to see if a --root argument was given
 		// Case 2: No '-' found, break out (for performance)
 		if (strcmp(argv[j], "--root") == 0) {
-			cout << "Starting from root" << endl;
 			*homedir = "/";
 			j++;
 			return j;
+		}
+		else if (strcmp(argv[j], "-f") == 0 || strcmp(argv[j], "-F") == 0) {
+			*funnel_type = "file";
+		}
+		else if (strcmp(argv[j], "-d") == 0 || strcmp(argv[j], "-d") == 0) {
+			*funnel_type = "directory";
 		}
 		else if (argv[j][0] != '-') {
 			break;
 		}
 
 		j++;
+		
 	}
 
 	// Will attempt to grab the HOME environment variable of the user
@@ -126,18 +132,60 @@ int vectorContains(vector<Object> input, string name) {
 
 	// Loop through each input object and compare to the
 	// file/directory name. Return the index if there is a match.
-	//cout << input.size() << endl;
 	for (int i = 0; i < input.size(); i++) {
 
-		//if (input.at(i).getName() == name) {
-		//cout << input.at(i).getName() << endl;
+		//cout << "input: " << input.at(i).getName() << "\tname: " << name << endl;
 		if (nameCompare(input.at(i).getName(), name)) {
 			return i;
 		}
 	}
 
-	// Return a -1 if not
 	return -1;
+}
+
+/*
+	If the user specified if they only wanted files or directories
+	we need to check their request with what our current entry is 
+	and funnel the ones out that they don't want.
+*/
+bool funnelCheck(struct dirent *entry, string funnel_type) {
+
+	if (funnel_type == "file" && entry->d_type == DT_DIR) {
+		return false;
+	}
+	else if (funnel_type == "directory" && entry->d_type != DT_DIR) {
+		return false;
+	}
+
+	//cout << "Good to go!" << endl;
+	return true;
+}
+
+
+
+
+
+/************************************************************************************************************
+
+										DEBUG FUNCTIONS
+
+*************************************************************************************************************/
+
+/*
+	Prints all of the items in the object vector with the 
+	paths that were found for the objects (if any).
+*/
+void printObjectVector(vector<Object> input) {
+
+	for (int i = 0; i < input.size(); i++) {
+
+		cout << "input[" << i << "]: " << input.at(i).getName() << endl;
+
+		for (int j = 0; j < input.at(i).getPaths().size(); j++) {
+
+			cout << "\t" << input.at(i).getPaths().at(j) << endl;
+		}
+	}
 }
 
 #endif

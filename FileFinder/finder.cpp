@@ -4,6 +4,7 @@ int main(int argc, char *argv[])
 {
 	int i;
 	const char *startdir;
+	string funnel_type = "";
 	vector<string> pathnames;
 	vector<Object> input;
 
@@ -14,14 +15,14 @@ int main(int argc, char *argv[])
 	}
 
 	//Decides if we are starting from root or home
-	i = getStartingDir(&startdir, argv);
+	i = argumentProcessor(&startdir, argv, &funnel_type);
 
 	//Copy the input from the user into our input vector
 	copyInput(input, argv, i);
 
 	//Finds the object in the file system
 	//Starting at the given dirname
-	findObject(startdir, 0, input);
+	findObject(startdir, input, funnel_type);
 
 	//Request user to choose path if multiple
 	for (int x = 0; x < input.size(); x++) {
@@ -50,78 +51,64 @@ int main(int argc, char *argv[])
 		sublime_command.append(pathnames.at(x) + " ");
 	}
 
-	sublime_command.append(" &");
-
 	cout << "Command: " << sublime_command << endl;
 
 	system(sublime_command.c_str());
 }
 
-void findObject(const char *name, int level, vector<Object> &input) {
+
+/*
+	Recursively goes through the filesystem from the current directory name
+	checking to see if the current directory or file matches on of our input names
+*/
+void findObject(const char *name, vector<Object> &input, string funnel_type) {
 
 	DIR *dir;
 	struct dirent *entry;
 
-	//Check to make sure the default directory can be opened
-	//In my case it is HOME
+	//Check to see if the current directory can be opened
 	if(!(dir = opendir(name)))
 		return;
 
-	//Checks to make sure that the dir is readable
+	//Checks to make sure that the current directory is readable
 	if(!(entry = readdir(dir)))
 		return;
 
+	// Do until there is nothing left to read
 	do {
-		
-		//If the entry type is Directory
-		if(entry->d_type == DT_DIR) {
-			
-			char path[1024];
-			int i;
-			int len = snprintf(path, sizeof(path) - 1, "%s/%s", name, entry->d_name);
-			path[len] = 0;
 
-			if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
+		char path[1024];
+		int i;
+		int len = snprintf(path, sizeof(path) - 1, "%s/%s", name, entry->d_name);
+		path[len] = 0;
+
+		// Skip over any names of . or ..
+		if(strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0)
 				continue;
 
-			i = vectorContains(input, string(entry->d_name));
+		// Checks to see if one of our input objects matches the current entry
+		i = vectorContains(input, string(entry->d_name));
 
-			//Checks to see if the entry name is in the input vector
-			if (i >= 0) {
+		// If the vectorContains function comes back with a match add the 
+		// entry name to the path list of the object
+		if (i >= 0) {
 
-					//Gets rid of extra '/' when starting from /
-					if (path[0] == '/' && path[1] == '/') {
-						memcpy(path, &path[1], sizeof(path) - 1);
-					}
-
-					input.at(i).addPath(string(path));
+			//Gets rid of extra '/' when starting from /
+			if (path[0] == '/' && path[1] == '/') {
+				memcpy(path, &path[1], sizeof(path) - 1);
 			}
 
-			//printf("%*s[%s]\n", level*2, "", entry->d_name);
-
-			findObject(path, level + 1, input);
-		}
-		else {
-
-			char path[1024];
-			int i;
-			int len = snprintf(path, sizeof(path) - 1, "%s/%s", name, entry->d_name);
-			path[len] = 0;
-
-			i = vectorContains(input, string(entry->d_name));
-
-			//Checks to see if the entry name is in the input vector
-			if (i >= 0) {
-
-					//Gets rid of extra '/' when starting from /
-					if (path[0] == '/' && path[1] == '/') {
-						memcpy(path, &path[1], sizeof(path) - 1);
-					}
-
-					input.at(i).addPath(string(path));
-					continue;
+			if (funnelCheck(entry, funnel_type)) {
+				input.at(i).addPath(string(path));
 			}
 		}
+
+		//If the entry type is Directory we need to recursively go into it
+		if(entry->d_type == DT_DIR) {
+
+			findObject(path, input, funnel_type);
+		}
+
 	} while (entry = readdir(dir));
 
 	closedir(dir);
