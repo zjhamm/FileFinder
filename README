@@ -1,24 +1,52 @@
--------------------------------- MAIN PROJECT --------------------------------
-This is a small project that makes it easier to open files or folders in 
-Sublime Text editor. Once set up, the user can open up a terminal and type in:
-"mysubl <file or folder name>" and the script will recursively go through the
-users home folder seraching for the given folders. Adding a --root will start
-the script from the root directory (this is not the default for performance
-purposes). The user can include multiple files and folders at once. 
+------------------------------------------------------ MAIN PROJECT ---------------------------------------------------------
+This is a small project that makes it easier to open files or folders in any given program that can be run 
+via the terminal. In my case I chose Sublime Text Editor, but with a few tweaks a user can open any file with 
+any program.This program can also be used as a general file locator to locate hidden files and print the pathname 
+out to the terminal (if tweaked a little). For my use case, the user can open up a terminal and type in: 
+"mysubl <file or folder name>" and the script will recursively go through the users home folder seraching for the 
+given folders or files. The user can include multiple files and folders to open at once. 
+
+There is a small setup required:
+
+	1. Open up mysubl.sh and change the pathnames to match your set up
+
+	2. If you want to be able to run the command from anywhere you need to let linux know that this command exists. 
+	   I do not remember the command from memory, but a simple google search will get you the answer you're looking for.
 
 
--------------------------------- NEW FEATURES -------------------------------
-A user can now type in part of the file or folder names, and the algorithm
-will look for substrings during it's search. For example, if the user types
-in 'finder' the algorithm will return 'FileFinder' as an option to open.
+----------------------------------------------------- NEW FEATURES ----------------------------------------------------------
+8/4/2016 - File Substring Search
 
--------------------------------- COMMENTS -----------------------------------
-The shell script simply compiles the c++ code and runs it.
+		   A user can now type in part of the file or folder names, and the algorithm will look for substrings during it's 
+		   search. For example, if the user types in 'finder' the algorithm will return 'FileFinder' as an option to open.
 
-I was originally thinking that I needed to remove file extensions in order to 
-let the user open a file if they had omitted the file type. I had set up a
-html scraper in python to go online and grab a list of file extensions,
-but once I finished that I realized how inefficient and a waste of time it
-was because I could simply just find a substring of the file. I left the 
-python script there incase I may need it for a different project in the future
-or if any third-parties are interested in seeing it.
+8/4/2016 - Type Specified Search
+
+		   A user can now specify if they want to only search for directories or files by adding the argument -d or -f to 
+		   their command. For example:
+
+		   			Command: 'mysubl -d finder' - will only search for DIRECTORIES with finder in the name
+
+		   			Command: 'mysubl -f finder' - will only search for FILES with finder in the name
+
+8/2/2016 - Start Search From Root
+
+		   A user can now start their search program from the root directory (/). This is not the default case for performance 
+		   reasons. Files most used are generally under the users HOME folder so that is why we start there. If a user 
+		   wishes to start from root add the argument --root. For example:
+
+		   			Command: 'mysubl --root finder'
+
+
+--------------------------------------------------------- COMMENTS ----------------------------------------------------------
+ - Possible plans: Introduce a feature to recommend files/folders that are more commonly used instead of just returning every 
+ 				   file/folder. This could greatly improve the performace by not even needing to perform the search if common
+ 				   pathnames were saved in a local file. The algorithm could just read from the file and ask the user if they
+ 				   would like to open saved pathnames. Otherwise, run the search.
+
+ - The shell script simply compiles the c++ code and runs it.
+
+ - I was originally thinking that I needed to remove file extensions in order to let the user open a file if they had omitted the 
+   file type. I had set up a html scraper in python to go online and grab a list of file extensions, but once I finished that I 
+   realized how inefficient and a waste of time it was because I could simply just find a substring of the file. I left the 
+   python script there incase I may need it for a different project in the future or if any third-parties are interested in seeing it.
